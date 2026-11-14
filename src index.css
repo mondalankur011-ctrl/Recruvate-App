@@ -1,0 +1,191 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 34 47% 93%;
+    --foreground: 249 21% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 249 21% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 249 21% 11%;
+    --primary: 16 85% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 36 43% 89%;
+    --secondary-foreground: 249 21% 11%;
+    --muted: 36 35% 92%;
+    --muted-foreground: 249 9% 42%;
+    --accent: 36 43% 89%;
+    --accent-foreground: 249 21% 11%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 34 26% 85%;
+    --input: 34 26% 85%;
+    --ring: 16 85% 55%;
+    --radius: 1rem;
+    --font-heading: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+    --font-script: 'Caveat', ui-serif, Georgia, cursive;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    --sidebar-background: 36 43% 89%;
+    --sidebar-foreground: 249 21% 11%;
+    --sidebar-primary: 16 85% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 100%;
+    --sidebar-accent-foreground: 249 21% 11%;
+    --sidebar-border: 34 26% 85%;
+    --sidebar-ring: 16 85% 55%;
+  }
+
+  .dark {
+    --background: 249 24% 11%;
+    --foreground: 38 54% 93%;
+    --card: 248 19% 16%;
+    --card-foreground: 38 54% 93%;
+    --popover: 248 19% 16%;
+    --popover-foreground: 38 54% 93%;
+    --primary: 16 85% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 248 14% 22%;
+    --secondary-foreground: 38 54% 93%;
+    --muted: 248 14% 20%;
+    --muted-foreground: 38 30% 75%;
+    --accent: 248 14% 22%;
+    --accent-foreground: 38 54% 93%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 38 30% 85%;
+    --input: 38 30% 85%;
+    --ring: 16 85% 55%;
+    --sidebar-background: 248 19% 16%;
+    --sidebar-foreground: 38 54% 93%;
+    --sidebar-primary: 16 85% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 248 14% 22%;
+    --sidebar-accent-foreground: 38 54% 93%;
+    --sidebar-border: 38 30% 85%;
+    --sidebar-ring: 16 85% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  a,
+  [role="button"],
+  nav,
+  .press,
+  .rounded-\[22px\],
+  .rounded-\[24px\],
+  .rounded-\[26px\],
+  .rounded-2xl,
+  .rounded-3xl {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  input,
+  textarea,
+  select,
+  [contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  ::selection {
+    background: rgba(238, 92, 43, 0.22);
+  }
+}
+
+@layer utilities {
+  .brand-gradient {
+    background-image: linear-gradient(135deg, #ee5c2b 0%, #ff9142 100%);
+  }
+
+  .brand-text-gradient {
+    background-image: linear-gradient(135deg, #ee5c2b 0%, #ff9142 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .safe-bottom {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+  }
+
+  .press {
+    transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease;
+  }
+
+  .press:active {
+    transform: scale(0.97);
+  }
+}
+
+@keyframes hru-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hru-note {
+  0%,
+  100% {
+    transform: rotate(-1.2deg) translateY(0);
+  }
+  50% {
+    transform: rotate(0.6deg) translateY(-5px);
+  }
+}
+
+@keyframes hru-halo {
+  0% {
+    box-shadow: 0 0 0 0 rgba(238, 92, 43, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(238, 92, 43, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(238, 92, 43, 0);
+  }
+}
+
+.animate-rise {
+  animation: hru-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-note {
+  animation: hru-note 5s ease-in-out infinite;
+}
+
+.animate-halo {
+  animation: hru-halo 2.4s ease-out infinite;
+}
