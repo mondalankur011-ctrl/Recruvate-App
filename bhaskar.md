@@ -138,6 +138,28 @@ This file explains in **simple words**:
 
 ---
 
+## 13. React Router Warning ("Matched leaf route at location...")
+* **What was the problem?**
+  In `App.jsx`, routes like `<Route path="/" />` and `<Route path="/profile" />` didn't have an `element` tag assigned, causing React Router to print yellow warning messages in the DevTools console.
+* **How it was fixed:**
+  Added `element={<></>}` so React Router knows each tab has a valid element.
+* **What it does now:**
+  The console is clean and free of route warnings.
+
+---
+
+## 14. Console 404 Errors (`/api/apps//analytics/...` and Grammarly)
+* **What was the problem?**
+  1. Base44's plugin was injecting an automatic analytics tracking script that tried to send telemetry to an empty app ID.
+  2. The browser console showed red errors starting with `Grammarly-check.js`.
+* **How it was fixed:**
+  - Disabled `analyticsTracker` in `vite.config.js` and in `base44Client.js`.
+  - Clarified that `Grammarly-check.js` errors come from the user's personal Grammarly Chrome extension, not the app's code.
+* **What it does now:**
+  Eliminates the background 404 network errors in DevTools.
+
+---
+
 ## Summary of Commands to Run
 
 To run the app right now:
