@@ -3,14 +3,18 @@ import { appParams } from '@/lib/app-params';
 
 const { appId, token, functionsVersion, appBaseUrl } = appParams;
 
-// Standard Base44 SDK client
-const realClient = createClient({
-  appId: appId || '',
-  token: token || '',
-  functionsVersion,
-  serverUrl: '',
-  appBaseUrl: appBaseUrl || ''
-});
+// Only initialize real client if appId and appBaseUrl are actually provided
+const hasRemoteConfig = Boolean(appId && appBaseUrl);
+const realClient = hasRemoteConfig
+  ? createClient({
+      appId,
+      token: token || '',
+      functionsVersion,
+      serverUrl: '',
+      appBaseUrl,
+      analytics: { enabled: false },
+    })
+  : null;
 
 // Seed data for local offline development / preview
 const INITIAL_JOBS = [
@@ -292,7 +296,7 @@ const mockApp = {
 export const base44 = {
   app: {
     async getPublicSettings() {
-      if (appId && appBaseUrl) {
+      if (realClient) {
         try {
           return await realClient.app.getPublicSettings();
         } catch {}
@@ -303,7 +307,7 @@ export const base44 = {
 
   auth: new Proxy(mockAuth, {
     get(target, prop) {
-      if (appId && appBaseUrl && typeof realClient.auth?.[prop] === "function") {
+      if (realClient && typeof realClient.auth?.[prop] === "function") {
         return async (...args) => {
           try {
             return await realClient.auth[prop](...args);

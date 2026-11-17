@@ -51,9 +51,9 @@ const AuthenticatedApp = () => {
           <Route path="video" element={<OnboardingVideo />} />
         </Route>
         <Route element={<AppShell />}>
-          <Route path="/" />
-          <Route path="/process" />
-          <Route path="/profile" />
+          <Route path="/" element={<></>} />
+          <Route path="/process" element={<></>} />
+          <Route path="/profile" element={<></>} />
         </Route>
       </Route>
 
