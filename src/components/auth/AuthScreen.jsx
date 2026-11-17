@@ -259,6 +259,21 @@ export default function AuthScreen({ initialMode = "signup" }) {
         Continue with Google
       </button>
 
+      <button
+        type="button"
+        onClick={() => {
+          setEmail("candidate@recruvate.com");
+          setPassword("Recruvate2026!");
+          if (isSignup) {
+            setPhone("+91 98765 43210");
+            setConfirm("Recruvate2026!");
+          }
+        }}
+        className="mt-2.5 flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-primary/40 bg-primary/5 text-xs font-bold text-primary hover:bg-primary/10 transition press"
+      >
+        Fill Demo Credentials
+      </button>
+
       <p className="mt-4 text-center text-sm text-foreground/55">
         {isSignup ? (
           <>

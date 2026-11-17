@@ -409,3 +409,31 @@ export default function Video() {
      base44 dashboard open
      ```
    * Or commit and push your branch to GitHub.
+
+---
+
+## 8. Runtime & Local Preview Fixes (Fixing the "Still Not Running" Issue)
+
+When running the project locally, users ran into two major execution blocks:
+
+### 8.1 Workspace Root `package.json`
+* **Issue:** The repository was nested inside `Recruvate-App`. When opening the terminal in the workspace root (`C:\MyCode\RecruvateApp`) and typing `npm run dev`, npm threw `ENOENT: no such file or directory, open 'package.json'`.
+* **Fix:** Created a root `package.json` with workspace delegation scripts that pass `npm --prefix Recruvate-App run ...`. Running `npm run dev` from the workspace root now starts the dev server immediately.
+
+### 8.2 Base44 Backend & Offline Fallback (`base44Client.js`)
+* **Issue:** When running without a live Base44 cloud account or `base44 link`, API calls to `/api/apps/undefined/...` failed with `TypeError: Failed to fetch`. This caused the app to freeze on an infinite loading spinner and prevented login, registration, and onboarding.
+* **Fix:** Added a comprehensive mock fallback inside `src/api/base44Client.js`. If no remote Base44 backend is configured:
+  - Auth runs locally via in-memory/localStorage (supports signup, login, OTP verification, and Google sign-in).
+  - Seeded 5 realistic job postings based on the PRD (HR Recruiter, Frontend Lead, People Partner, Full Stack Engineer, Product Designer).
+  - Enables full interactive onboarding (Details, Socials, Video pitch), application submission with the 48-hour countdown timer, and profile management.
+  - Added a "Fill Demo Credentials" button on the login screen for 1-click test access.
+
+### 8.3 Infinite Spinner & Lifecycle Safeguards
+* **Issue:** `AuthContext.jsx`, `AppShell.jsx`, `Onboarding.jsx`, and `OpenJobs.jsx` did not handle rejected network promises in `finally` blocks, leaving loading states permanently set to `true`.
+* **Fix:** Added `finally { setLoading(false) }`, set `authChecked(true)` on initialization failure, and added optional chaining guards so the UI renders gracefully even if the network is disconnected.
+
+### 8.4 PWA Manifest Fix
+* **Issue:** `entities/Job.jsonc` accidentally contained the contents of a PWA `manifest.json`, while `Job` had no valid schema and `index.html`'s `<link rel="manifest" href="/manifest.json" />` returned a 404.
+* **Fix:** Created `public/manifest.json` with the PWA metadata and restored `entities/Job.jsonc` to the proper schema.
+
+

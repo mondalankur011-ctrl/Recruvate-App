@@ -31,6 +31,7 @@ export default function Profile() {
 
   const confirmDelete = async (event) => {
     event.preventDefault();
+    if (!profile?.id) return;
     setDeleting(true);
     try {
       await base44.entities.CandidateProfile.delete(profile.id);
@@ -49,6 +50,14 @@ export default function Profile() {
       setDeleting(false);
     }
   };
+
+  if (!profile) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+      </div>
+    );
+  }
 
   const items = [
     { label: "Account created", done: true },

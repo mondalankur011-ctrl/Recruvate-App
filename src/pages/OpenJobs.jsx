@@ -20,14 +20,18 @@ export default function OpenJobs() {
   const [showUploader, setShowUploader] = useState(false);
 
   const loadData = useCallback(async () => {
-    const [jobPage, apps, saves] = await Promise.all([
-      base44.entities.Job.filter({ is_active: true }, { sort: "-created_date", limit: 100 }),
-      base44.entities.Application.filter({ created_by_id: user.id }),
-      base44.entities.SavedJob.filter({ created_by_id: user.id }),
-    ]);
-    setJobs(jobPage.items || []);
-    setApplications(apps || []);
-    setSavedJobs(saves || []);
+    try {
+      const [jobPage, apps, saves] = await Promise.all([
+        base44.entities.Job.filter({ is_active: true }, { sort: "-created_date", limit: 100 }),
+        base44.entities.Application.filter({ created_by_id: user.id }),
+        base44.entities.SavedJob.filter({ created_by_id: user.id }),
+      ]);
+      setJobs(jobPage.items || []);
+      setApplications(apps || []);
+      setSavedJobs(saves || []);
+    } catch (err) {
+      console.warn("Error loading open jobs data:", err);
+    }
   }, [user]);
 
   useEffect(() => {
@@ -35,14 +39,14 @@ export default function OpenJobs() {
     loadData().finally(() => setLoading(false));
   }, [user, loadData]);
 
-  const resumeDate = profile.resume_updated_date ? new Date(profile.resume_updated_date) : null;
+  const resumeDate = profile?.resume_updated_date ? new Date(profile.resume_updated_date) : null;
   const monthsSince = resumeDate ? (Date.now() - resumeDate.getTime()) / MONTH_MS : 99;
-  const dismissedAt = profile.reminder_dismissed_at ? new Date(profile.reminder_dismissed_at) : null;
+  const dismissedAt = profile?.reminder_dismissed_at ? new Date(profile.reminder_dismissed_at) : null;
   const dismissedThisCycle = dismissedAt && (!resumeDate || dismissedAt > resumeDate);
-  const resumeOverdue = !profile.resume_file_uri || monthsSince >= 6;
+  const resumeOverdue = !profile?.resume_file_uri || monthsSince >= 6;
 
   useEffect(() => {
-    if (!resumeOverdue || monthsSince < 6) return;
+    if (!resumeOverdue || monthsSince < 6 || !user?.id) return;
     const ensureNotification = async () => {
       const existing = await base44.entities.Notification.filter({
         created_by_id: user.id,

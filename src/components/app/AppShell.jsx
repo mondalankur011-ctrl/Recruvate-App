@@ -23,11 +23,20 @@ export default function AppShell() {
   const location = useLocation();
 
   const loadProfile = async () => {
-    if (!user) return null;
-    const records = await base44.entities.CandidateProfile.filter({ created_by_id: user.id });
-    setProfile(records?.[0] || null);
-    setLoading(false);
-    return records?.[0] || null;
+    if (!user) {
+      setLoading(false);
+      return null;
+    }
+    try {
+      const records = await base44.entities.CandidateProfile.filter({ created_by_id: user.id });
+      setProfile(records?.[0] || null);
+      return records?.[0] || null;
+    } catch (err) {
+      console.warn("Error loading profile:", err);
+      return null;
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

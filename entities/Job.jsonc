@@ -1,27 +1,45 @@
 {
-  "name": "HR's Universe — by Recruvate",
-  "short_name": "HR's Universe",
-  "description": "Careers with a human voice. Get matched to roles, track every application, and introduce yourself in a one-minute video.",
-  "id": "/",
-  "start_url": "/",
-  "scope": "/",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#F7F0E4",
-  "theme_color": "#F7F0E4",
-  "categories": ["business", "productivity"],
-  "icons": [
-    {
-      "src": "https://media.base44.com/images/public/6ae45ebdce8c66f2fb594817/5323a059f_Screenshot2026-08-15110308.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
+  "name": "Job",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
     },
-    {
-      "src": "https://media.base44.com/images/public/6ae45ebdce8c66f2fb594817/5323a059f_Screenshot2026-08-15110308.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+    "company": {
+      "type": "string"
+    },
+    "department": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "salary_range": {
+      "type": "string"
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "description": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
     }
-  ]
+  },
+  "required": [
+    "title",
+    "company",
+    "department"
+  ],
+  "rls": {
+    "read": {}
+  }
 }

@@ -13,22 +13,29 @@ export default function Onboarding() {
     let alive = true;
     const load = async () => {
       if (!user) return;
-      const records = await base44.entities.CandidateProfile.filter({ created_by_id: user.id });
-      const existing = records?.[0];
-      if (existing?.onboarding_complete) {
-        navigate("/", { replace: true });
-        return;
-      }
-      const record =
-        existing ||
-        (await base44.entities.CandidateProfile.create({
-          email: user.email,
-          phone: localStorage.getItem("hru_signup_phone") || "",
-          full_name: user.full_name || "",
-        }));
-      if (alive) {
-        setProfile(record);
-        setLoading(false);
+      try {
+        const records = await base44.entities.CandidateProfile.filter({ created_by_id: user.id });
+        const existing = records?.[0];
+        if (existing?.onboarding_complete) {
+          navigate("/", { replace: true });
+          return;
+        }
+        const record =
+          existing ||
+          (await base44.entities.CandidateProfile.create({
+            email: user.email,
+            phone: localStorage.getItem("hru_signup_phone") || "",
+            full_name: user.full_name || "",
+          }));
+        if (alive) {
+          setProfile(record);
+        }
+      } catch (err) {
+        console.warn("Error loading onboarding profile:", err);
+      } finally {
+        if (alive) {
+          setLoading(false);
+        }
       }
     };
     load();

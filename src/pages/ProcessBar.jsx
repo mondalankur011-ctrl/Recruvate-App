@@ -19,13 +19,17 @@ export default function ProcessBar() {
   }, []);
 
   const loadData = useCallback(async () => {
-    const records = await base44.entities.Application.filter({ created_by_id: user.id });
-    const sorted = [...records].sort(
-      (a, b) =>
-        new Date(b.applied_at || b.created_date).getTime() -
-        new Date(a.applied_at || a.created_date).getTime()
-    );
-    setApplications(sorted);
+    try {
+      const records = await base44.entities.Application.filter({ created_by_id: user.id });
+      const sorted = [...records].sort(
+        (a, b) =>
+          new Date(b.applied_at || b.created_date).getTime() -
+          new Date(a.applied_at || a.created_date).getTime()
+      );
+      setApplications(sorted);
+    } catch (err) {
+      console.warn("Error loading applications:", err);
+    }
   }, [user]);
 
   useEffect(() => {
