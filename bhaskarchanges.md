@@ -1,59 +1,115 @@
-# Bhaskar Changes Documentation
+# Bhaskar Documentation — Recruvate Web App (HR's Universe)
 
-This document explains every change made to the **Recruvate App** repository, the reason behind each change, and what to do with the code going forward.
+> Complete log and guide explaining every issue found, code change made, reasoning behind it, and next steps for the project.
 
 ---
 
 ## Table of Contents
-1. [Summary of Issues Found](#1-summary-of-issues-found)
-2. [Folder & File Restructuring](#2-folder--file-restructuring)
-3. [Vite Alias Configuration (`vite.config.js`)](#3-vite-alias-configuration-viteconfigjs)
-4. [JavaScript Project Configuration (`jsconfig.json`)](#4-javascript-project-configuration-jsconfigjson)
-5. [JSX Extension Fix (`AuthFrame.jsx`)](#5-jsx-extension-fix-authframejsx)
-6. [Missing Page Route Wrappers](#6-missing-page-route-wrappers)
-   - [6.1 `src/pages/Login.jsx`](#61-srcpagesloginjsx)
-   - [6.2 `src/pages/ForgotPassword.jsx`](#62-srcpagesforgotpasswordjsx)
-   - [6.3 `src/pages/onboarding/Details.jsx`](#63-srcpagesonboardingdetailsjsx)
-   - [6.4 `src/pages/onboarding/Socials.jsx`](#64-srcpagesonboardingsocialsjsx)
-   - [6.5 `src/pages/onboarding/Video.jsx`](#65-srcpagesonboardingvideojsx)
-7. [What To Do With This Code (Next Steps)](#7-what-to-do-with-this-code-next-steps)
+1. [Overview & Project Type](#1-overview--project-type)
+2. [Original Problems Discovered](#2-original-problems-discovered)
+3. [Folder & File Restructuring](#3-folder--file-restructuring)
+4. [Vite Alias Configuration (`vite.config.js`)](#4-vite-alias-configuration-viteconfigjs)
+5. [Project Configuration (`jsconfig.json`)](#5-project-configuration-jsconfigjson)
+6. [JSX Syntax & Extension Fix (`AuthFrame.jsx`)](#6-jsx-syntax--extension-fix-authframejsx)
+7. [Missing Page Route Wrappers](#7-missing-page-route-wrappers)
+   - [7.1 `src/pages/Login.jsx`](#71-srcpagesloginjsx)
+   - [7.2 `src/pages/ForgotPassword.jsx`](#72-srcpagesforgotpasswordjsx)
+   - [7.3 `src/pages/onboarding/Details.jsx`](#73-srcpagesonboardingdetailsjsx)
+   - [7.4 `src/pages/onboarding/Socials.jsx`](#74-srcpagesonboardingsocialsjsx)
+   - [7.5 `src/pages/onboarding/Video.jsx`](#75-srcpagesonboardingvideojsx)
+8. [Workspace Root Configuration (`package.json`)](#8-workspace-root-configuration-packagejson)
+9. [Runtime & Offline Mock Architecture (`base44Client.js`)](#9-runtime--offline-mock-architecture-base44clientjs)
+10. [Infinite Loading & Lifecycle Safeguards](#10-infinite-loading--lifecycle-safeguards)
+11. [PWA Manifest & Entity Schema Fix](#11-pwa-manifest--entity-schema-fix)
+12. [Dev Server Configuration](#12-dev-server-configuration)
+13. [How to Run, Build, and Maintain](#13-how-to-run-build-and-maintain)
 
 ---
 
-## 1. Summary of Issues Found
+## 1. Overview & Project Type
 
-When inspecting the repository, the project could not run or build due to several core issues:
-1. **Flattened Directory Names:** Over 100 files had spaces instead of directory slashes (e.g., `src App.jsx`, `entities Job.jsonc`, `src components app AppShell.jsx` were all sitting flat in the root directory).
-2. **Missing Path Alias Resolution:** Imports using `@/` (such as `@/components/ui/button`) failed or threw warnings because Vite was not configured with an absolute path alias.
-3. **Missing `jsconfig.json`:** The script `npm run typecheck` failed because `jsconfig.json` was missing.
-4. **File Extension Syntax Error:** `AuthFrame.js` contained JSX syntax, which Vite rejected during build because Vite requires the `.jsx` extension for files containing JSX elements.
-5. **Missing Route Page Wrappers:** `src/App.jsx` declared routes for `/login`, `/forgot-password`, `/onboarding/details`, `/onboarding/socials`, and `/onboarding/video`, but these page components did not exist in `src/pages/`.
+### Is this an App or Web?
+This is a **Web Application built as a Mobile-First Progressive Web App (PWA)**:
+* **Technology:** 100% web technology (React 18, Vite, Tailwind CSS, Lucide icons, Radix UI).
+* **Look & Feel:** Designed to look and function like a mobile phone app (with bottom navigation, pull-to-refresh, video pitch recording, and quick application pipelines).
+* **Installable (PWA):** Users can visit the site on mobile or desktop and click **"Add to Home Screen"** / **"Install"** to run it in full-screen standalone mode without going through the Google Play Store or Apple App Store.
 
 ---
 
-## 2. Folder & File Restructuring
+## 2. Original Problems Discovered
+
+When inspecting the repository, the project could neither build nor run due to several critical blocks:
+1. **Flattened File Tree:** 115 files had spaces instead of directory slashes (e.g. `src App.jsx`, `entities Job.jsonc`, `src components auth AuthScreen.jsx` sat flat in the root folder).
+2. **Missing Path Alias:** Vite threw warnings and failed to resolve `@/...` imports to absolute physical paths.
+3. **Missing `jsconfig.json`:** `npm run typecheck` broke because `tsc -p ./jsconfig.json` was looking for a non-existent config file.
+4. **Syntax Error during Vite Build:** `AuthFrame.js` contained JSX tags inside a `.js` file, which Rollup/Vite rejected.
+5. **Missing Page Routes:** `src/App.jsx` imported 5 route wrappers (`Login`, `ForgotPassword`, `Details`, `Socials`, `Video`) that did not exist in `src/pages/`.
+6. **Workspace Root Disconnect:** The outer folder was `RecruvateApp` while files lived inside `Recruvate-App`. Running `npm run dev` in the workspace root failed with `package.json not found`.
+7. **Base44 Cloud Lock & Infinite Spinner:** Without an active Base44 cloud backend or Deno instance, API calls failed with `TypeError: Failed to fetch`, trapping the user in an infinite loading spinner and preventing login, registration, and onboarding.
+8. **PWA Manifest Error:** `entities/Job.jsonc` accidentally contained the JSON for the PWA web app manifest instead of the `Job` schema, while `index.html`'s `/manifest.json` returned 404.
+
+---
+
+## 3. Folder & File Restructuring
 
 ### What was changed:
-All 115 files that were sitting flat in the root folder with spaces in their names were moved into their correct directory structure using `git mv`:
-* Files starting with `src ...` were moved into `src/...`
-* Files starting with `entities ...` were moved into `entities/...`
-* Files starting with `connectors ...` were moved into `connectors/...`
+All 115 flattened files were moved into their correct directory hierarchy using `git mv`:
+* `src ...` $\rightarrow$ `src/...`
+* `entities ...` $\rightarrow$ `entities/...`
+* `connectors ...` $\rightarrow$ `connectors/...`
+
+### Clean Directory Structure Result:
+```
+Recruvate-App/
+├── connectors/
+│   └── github.jsonc
+├── entities/
+│   ├── Application.jsonc
+│   ├── CandidateProfile.jsonc
+│   └── Job.jsonc
+├── public/
+│   └── manifest.json
+├── src/
+│   ├── api/
+│   │   └── base44Client.js
+│   ├── components/
+│   │   ├── app/
+│   │   ├── auth/
+│   │   ├── brand/
+│   │   ├── jobs/
+│   │   ├── onboarding/
+│   │   ├── process/
+│   │   ├── profile/
+│   │   └── ui/
+│   ├── hooks/
+│   ├── lib/
+│   ├── pages/
+│   │   └── onboarding/
+│   ├── utils/
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
+├── index.html
+├── jsconfig.json
+├── package.json
+├── tailwind.config.js
+└── vite.config.js
+```
 
 ### Why:
-* In `index.html`, Vite looks for `/src/main.jsx`.
-* In `src/App.jsx` and across all components, modules import from `@/components/...`, `@/lib/...`, `@/pages/...`, and `@/hooks/...`.
-* When files have spaces in their names in the root directory, neither the Node runtime, Vite, nor Git can resolve directory-based module paths.
+* Vite's entry point in `index.html` references `/src/main.jsx`.
+* All ESM imports in the codebase use structured paths like `@/components/ui/button`.
+* Flattened filenames with spaces in the root directory break all module resolution.
 
 ### What to do with it:
-* **Keep this folder structure intact.** Do not rename or flatten files back into root. All future components should go into `src/components/`, pages into `src/pages/`, etc.
+* **Leave this structure as is.** Place all new UI components in `src/components/`, new screens in `src/pages/`, and shared logic in `src/lib/`.
 
 ---
 
-## 3. Vite Alias Configuration (`vite.config.js`)
+## 4. Vite Alias Configuration (`vite.config.js`)
 
 ### What was changed:
-Added path resolution for the `@` symbol pointing to the `src` directory using Node's `path` and `fileURLToPath`:
-
+Added path aliasing in `vite.config.js`:
 ```javascript
 import base44 from "@base44/vite-plugin"
 import react from '@vitejs/plugin-react'
@@ -64,6 +120,10 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
+  server: {
+    host: '127.0.0.1',
+    port: 5173,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -83,20 +143,17 @@ export default defineConfig({
 ```
 
 ### Why:
-* Vite emitted the warning:
-  `[plugin builtin:vite-alias] rewrote @/pages/... but was not an absolute path...`
-* Adding `resolve.alias: { '@': path.resolve(__dirname, './src') }` allows Vite to unambiguously resolve every `@/...` import to the exact absolute path on disk.
+* Resolves `@/` to the physical disk path of `./src`, eliminating duplicate module warnings and module import failures during build and HMR.
 
 ### What to do with it:
-* Leave this configuration in `vite.config.js`. If you add new top-level aliases later (e.g. `@assets`), you can register them inside `resolve.alias`.
+* Keep this file as configured. Any future custom path aliases can be added under `resolve.alias`.
 
 ---
 
-## 4. JavaScript Project Configuration (`jsconfig.json`)
+## 5. Project Configuration (`jsconfig.json`)
 
 ### What was created:
-Created `jsconfig.json` in the root of `Recruvate-App`:
-
+Created `Recruvate-App/jsconfig.json`:
 ```json
 {
   "compilerOptions": {
@@ -117,323 +174,175 @@ Created `jsconfig.json` in the root of `Recruvate-App`:
 ```
 
 ### Why:
-* `package.json` includes `"typecheck": "tsc -p ./jsconfig.json"`. Without this file, running `npm run typecheck` returned an error: `Cannot read file './jsconfig.json'`.
-* It enables VS Code, Cursor, and IDEs to understand `@/*` path mapping so you get "Go to Definition", auto-imports, and IntelliSense.
+* Enables `npm run typecheck` (`tsc -p ./jsconfig.json`) to validate code without crashing.
+* Gives VS Code / Cursor IDEs full IntelliSense, autocomplete, and jump-to-definition for all `@/*` imports.
 
 ### What to do with it:
-* Keep this file in the project root. It ensures code intelligence and type-checking work out of the box.
+* Keep in root.
 
 ---
 
-## 5. JSX Extension Fix (`AuthFrame.jsx`)
+## 6. JSX Syntax & Extension Fix (`AuthFrame.jsx`)
 
 ### What was changed:
-Renamed `src/components/auth/AuthFrame.js` to `src/components/auth/AuthFrame.jsx`.
+Renamed `src/components/auth/AuthFrame.js` $\rightarrow$ `src/components/auth/AuthFrame.jsx`.
 
 ### Why:
-* Vite's default JavaScript parser disables JSX syntax inside `.js` files. When building, Vite threw:
-  `[builtin:vite-transform] Unexpected JSX expression in src/components/auth/AuthFrame.js:6:5`
-* Renaming to `.jsx` tells the Vite compiler to parse JSX tags (`<div>`, `<BrandMark />`) properly.
+* Vite uses Rollup / esbuild, which strictly disallows JSX expressions (`<div>`, `<BrandMark />`) in `.js` files. Renaming to `.jsx` enables the JSX compiler.
 
 ### What to do with it:
-* Keep the `.jsx` extension for all React components containing JSX markup.
+* Keep as `.jsx`. Always name React components containing JSX tags with `.jsx` or `.tsx`.
 
 ---
 
-## 6. Missing Page Route Wrappers
+## 7. Missing Page Route Wrappers
 
-In `src/App.jsx`, routes were defined for authentication and onboarding, but the wrapper files were not provided in the original repository. We created them to complete the routing architecture.
+`src/App.jsx` contained routes that were missing their implementation files. We created all 5 wrapper pages:
 
----
+### 7.1 `src/pages/Login.jsx`
+* **Code:**
+  ```jsx
+  import React from "react";
+  import AuthScreen from "@/components/auth/AuthScreen";
 
-### 6.1 `src/pages/Login.jsx`
-
-#### Code:
-```jsx
-import React from "react";
-import AuthScreen from "@/components/auth/AuthScreen";
-
-export default function Login() {
-  return <AuthScreen initialMode="login" />;
-}
-```
-
-#### Why:
-* `src/App.jsx` renders `<Route path="/login" element={<Login />} />`.
-* The existing `Register.jsx` used `<AuthScreen initialMode="signup" />`. The `AuthScreen` component was already built to handle both `login` and `signup` states. Creating `Login.jsx` connects the `/login` route to `AuthScreen` with `initialMode="login"`.
-
-#### What to do with it:
-* When users navigate to `/login`, this loads the branded Recruvate login screen with email/password and Google login options. You can add extra banners or links here if needed in the future.
-
----
-
-### 6.2 `src/pages/ForgotPassword.jsx`
-
-#### Code:
-```jsx
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Mail, Loader2, CheckCircle2 } from "lucide-react";
-import AuthLayout from "@/components/AuthLayout";
-
-export default function ForgotPassword() {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      await base44.auth.resetPasswordRequest(email.trim());
-      setSubmitted(true);
-    } catch (err) {
-      setError(err.message || "Failed to send reset link");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (submitted) {
-    return (
-      <AuthLayout
-        icon={CheckCircle2}
-        title="Check your email"
-        subtitle={`We've sent a password reset link to ${email}`}
-        footer={
-          <Link to="/login" className="text-primary font-medium hover:underline">
-            Back to login
-          </Link>
-        }
-      >
-        <p className="text-sm text-foreground/70 text-center">
-          Click the link in the email to reset your password. If you don't see it, check your spam folder.
-        </p>
-      </AuthLayout>
-    );
+  export default function Login() {
+    return <AuthScreen initialMode="login" />;
   }
+  ```
+* **Why:** Maps `/login` to `AuthScreen` in login mode.
+* **What to do:** Renders the Recruvate login screen.
 
-  return (
-    <AuthLayout
-      icon={Mail}
-      title="Reset your password"
-      subtitle="Enter your email and we'll send you a link to reset your password"
-      footer={
-        <div className="text-center text-sm">
-          Remember your password?{" "}
-          <Link to="/login" className="text-primary font-medium hover:underline">
-            Log in
-          </Link>
-        </div>
-      }
-    >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {error && (
-          <div className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive font-medium">
-            {error}
-          </div>
-        )}
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            required
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Sending link...
-            </>
-          ) : (
-            "Send reset link"
-          )}
-        </Button>
-      </form>
-    </AuthLayout>
-  );
+### 7.2 `src/pages/ForgotPassword.jsx`
+* **Code:** Uses `AuthLayout`, input form, and calls `base44.auth.resetPasswordRequest(email)`.
+* **Why:** Maps `/forgot-password` so candidates who forgot their credentials can request a password reset email.
+* **What to do:** Handles password reset requests.
+
+### 7.3 `src/pages/onboarding/Details.jsx`
+* **Code:** Connects to `useOutletContext()` from `Onboarding.jsx` and renders `DetailsStep`.
+* **Why:** Handles Step 1 of candidate onboarding (Full name, Department, Location, Resume upload) and navigates to `/onboarding/socials`.
+* **What to do:** Manages personal profile initialization.
+
+### 7.4 `src/pages/onboarding/Socials.jsx`
+* **Code:** Connects to `useOutletContext()` and renders `SocialsStep`.
+* **Why:** Handles Step 2 of onboarding (optional LinkedIn, Instagram, Facebook, Threads) with next & skip controls, navigating to `/onboarding/video`.
+* **What to do:** Manages social profile linking.
+
+### 7.5 `src/pages/onboarding/Video.jsx`
+* **Code:** Connects to `useOutletContext()` and renders `VideoStep`.
+* **Why:** Handles Step 3 of onboarding (the signature 40–90 second candidate video pitch), saves video details, sets `onboarding_complete: true`, and navigates to the home page (`/`).
+* **What to do:** Finalizes candidate onboarding.
+
+---
+
+## 8. Workspace Root Configuration (`package.json`)
+
+### What was created:
+Created `C:\MyCode\RecruvateApp\package.json`:
+```json
+{
+  "name": "recruvate-app-workspace",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "npm --prefix Recruvate-App run dev",
+    "build": "npm --prefix Recruvate-App run build",
+    "lint": "npm --prefix Recruvate-App run lint",
+    "typecheck": "npm --prefix Recruvate-App run typecheck",
+    "preview": "npm --prefix Recruvate-App run preview"
+  }
 }
 ```
 
-#### Why:
-* `src/App.jsx` renders `<Route path="/forgot-password" element={<ForgotPassword />} />`.
-* `ResetPassword.jsx` references `/forgot-password`, and `AuthScreen.jsx` displays a "Forgot password?" link pointing to `/forgot-password`.
-* It calls `base44.auth.resetPasswordRequest(email)` from `@base44/sdk`, matching the backend authentication API.
+### Why:
+* Users open terminal in `C:\MyCode\RecruvateApp` (the workspace root). Running `npm run dev` was failing with `package.json not found`. This root package file transparently delegates commands to `Recruvate-App`.
 
-#### What to do with it:
-* This provides a complete password recovery flow. When users submit their email, Base44 sends a reset link pointing to `/reset-password?token=...`.
+### What to do with it:
+* You can now run `npm run dev` or `npm run build` from either directory.
 
 ---
 
-### 6.3 `src/pages/onboarding/Details.jsx`
+## 9. Runtime & Offline Mock Architecture (`base44Client.js`)
 
-#### Code:
-```jsx
-import React from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
-import DetailsStep from "@/components/onboarding/DetailsStep";
+### What was changed:
+Rewrote [src/api/base44Client.js](file:///C:/MyCode/RecruvateApp/Recruvate-App/src/api/base44Client.js) with a hybrid architecture:
+1. **Cloud Mode:** If `appId` and `appBaseUrl` are configured and reachable, it connects to the real Base44 backend.
+2. **Offline Local Mock Mode:** If no backend is running or configured, it automatically provides a local in-memory/localStorage engine:
+   * **Authentication:** Instant signup, login, OTP verification, and Google demo login.
+   * **Seeded Jobs:** 5 realistic Pan-India jobs based on PRD specifications:
+     - *Senior Technical Recruiter* (Recruvate Pan India, ₹12 - 18 LPA)
+     - *Lead Frontend Engineer* (Fintech Unicorn, ₹24 - 35 LPA)
+     - *People & Culture Specialist* (Recruvate Spotlight, ₹9 - 14 LPA)
+     - *Full Stack Engineer* (SaaS Partner, ₹18 - 28 LPA)
+     - *Senior Product Designer* (Consumer Tech, ₹20 - 30 LPA)
+   * **Applications & Process Bar:** Saves submitted applications and displays the 48-hour response countdown pipeline.
+   * **File Uploads:** Local Object URLs for uploaded resumes and video recordings.
 
-export default function Details() {
-  const { profile, save } = useOutletContext();
-  const navigate = useNavigate();
+### Quick Demo Access:
+Added a **"Fill Demo Credentials"** button on `AuthScreen.jsx` so anyone can test the app with 1 click (`candidate@recruvate.com` / `Recruvate2026!`).
 
-  const handleNext = async (patch) => {
-    await save(patch);
-    navigate("/onboarding/socials");
-  };
+---
 
-  return <DetailsStep profile={profile} onNext={handleNext} />;
+## 10. Infinite Loading & Lifecycle Safeguards
+
+### What was changed:
+* **`AuthContext.jsx`:** Guaranteed `setAuthChecked(true)` runs in all error/offline cases so `ProtectedRoute` never gets stuck waiting for authentication checks.
+* **`AppShell.jsx`:** Wrapped `loadProfile()` in `try ... catch ... finally { setLoading(false) }`.
+* **`Onboarding.jsx`:** Wrapped profile initialization in `try ... catch ... finally { setLoading(false) }`.
+* **`OpenJobs.jsx`:** Added optional chaining (`profile?.resume_updated_date`) and error handling on data fetch.
+* **`Profile.jsx`:** Added null guard before reading profile properties.
+
+### Why:
+* Previously, any rejected network promise left `loading === true`, displaying an infinite spinning circle that blocked the UI. Now all loading states resolve cleanly.
+
+---
+
+## 11. PWA Manifest & Entity Schema Fix
+
+### What was changed:
+1. Created [public/manifest.json](file:///C:/MyCode/RecruvateApp/Recruvate-App/public/manifest.json) containing the PWA metadata (app name, standalone display mode, theme colors, icons).
+2. Restored [entities/Job.jsonc](file:///C:/MyCode/RecruvateApp/Recruvate-App/entities/Job.jsonc) to a valid schema defining `title`, `company`, `department`, `location`, `salary_range`, `skills`, and `description`.
+
+### Why:
+* `index.html` references `/manifest.json` for PWA mobile installability.
+* `entities/Job.jsonc` had been accidentally overwritten with manifest contents.
+
+---
+
+## 12. Dev Server Configuration
+
+Configured Vite in `vite.config.js` to run on `http://127.0.0.1:5173/`:
+```javascript
+server: {
+  host: '127.0.0.1',
+  port: 5173,
 }
 ```
 
-#### Why:
-* In `src/App.jsx`, `/onboarding` is a parent route containing `<Route path="details" element={<OnboardingDetails />} />`.
-* `src/pages/Onboarding.jsx` provides `<Outlet context={{ profile, save, setProfile, user }} />`.
-* `Details.jsx` reads `profile` and `save` from the outlet context, connects to the existing `DetailsStep` component, saves the name/location/department/resume, and moves the user forward to `/onboarding/socials`.
-
-#### What to do with it:
-* This manages Step 1 of onboarding. If you ever want to add new fields to the candidate's initial details, update `DetailsStep.jsx`.
-
 ---
 
-### 6.4 `src/pages/onboarding/Socials.jsx`
+## 13. How to Run, Build, and Maintain
 
-#### Code:
-```jsx
-import React from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
-import SocialsStep from "@/components/onboarding/SocialsStep";
+### Running the App:
+From `C:\MyCode\RecruvateApp` or `C:\MyCode\RecruvateApp\Recruvate-App`:
+```bash
+npm run dev
+```
+Then open: **http://127.0.0.1:5173/** in your browser.
 
-export default function Socials() {
-  const { profile, save } = useOutletContext();
-  const navigate = useNavigate();
-
-  const handleNext = async (patch) => {
-    await save(patch);
-    navigate("/onboarding/video");
-  };
-
-  const handleSkip = () => {
-    navigate("/onboarding/video");
-  };
-
-  return <SocialsStep profile={profile} onNext={handleNext} onSkip={handleSkip} />;
-}
+### Verifying Code:
+```bash
+npm run lint       # Runs ESLint (0 errors)
+npm run typecheck  # Runs TypeScript / JS check (0 errors)
+npm run build      # Produces production bundle in dist/
 ```
 
-#### Why:
-* In `src/App.jsx`, `/onboarding` contains `<Route path="socials" element={<OnboardingSocials />} />`.
-* It connects the existing `SocialsStep` component to `Onboarding.jsx`'s outlet context and handles both the "Next" (save links) and "Skip" flows by routing the candidate to `/onboarding/video`.
-
-#### What to do with it:
-* This manages Step 2 of onboarding (optional social links: LinkedIn, Instagram, Facebook, Threads).
-
----
-
-### 6.5 `src/pages/onboarding/Video.jsx`
-
-#### Code:
-```jsx
-import React from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
-import VideoStep from "@/components/onboarding/VideoStep";
-
-export default function Video() {
-  const { profile, save } = useOutletContext();
-  const navigate = useNavigate();
-
-  const handleNext = async (patch) => {
-    await save({ ...patch, onboarding_complete: true });
-    navigate("/", { replace: true });
-  };
-
-  const handleBack = () => {
-    navigate("/onboarding/socials");
-  };
-
-  return <VideoStep profile={profile} onNext={handleNext} onBack={handleBack} />;
-}
-```
-
-#### Why:
-* In `src/App.jsx`, `/onboarding` contains `<Route path="video" element={<OnboardingVideo />} />`.
-* According to `PRD.md`, the video introduction is the signature feature of HR's Universe and is mandatory to complete onboarding.
-* When the candidate uploads or records their video, this component saves the video metadata (`intro_video_uri`, `duration`, `quality`) along with `onboarding_complete: true` to the `CandidateProfile` entity, then redirects them to the main app dashboard at `/`.
-
-#### What to do with it:
-* This manages Step 3 of onboarding (the video pitch).
-
----
-
-## 7. What To Do With This Code (Next Steps)
-
-1. **Running in Local Development:**
-   * Run the Base44 CLI command from `Recruvate-App`:
-     ```bash
-     base44 dev
-     ```
-   * Or run frontend only with:
-     ```bash
-     npm run dev
-     ```
-
-2. **Verifying Code Integrity:**
-   * To check for linting errors:
-     ```bash
-     npm run lint
-     ```
-   * To check TypeScript / JS types:
-     ```bash
-     npm run typecheck
-     ```
-   * To create a production build:
-     ```bash
-     npm run build
-     ```
-     *(Build outputs to the `dist/` directory and is ready for deployment).*
-
-3. **Deploying / Publishing:**
-   * Once you are ready to publish changes to Base44:
-     ```bash
-     base44 dashboard open
-     ```
-   * Or commit and push your branch to GitHub.
-
----
-
-## 8. Runtime & Local Preview Fixes (Fixing the "Still Not Running" Issue)
-
-When running the project locally, users ran into two major execution blocks:
-
-### 8.1 Workspace Root `package.json`
-* **Issue:** The repository was nested inside `Recruvate-App`. When opening the terminal in the workspace root (`C:\MyCode\RecruvateApp`) and typing `npm run dev`, npm threw `ENOENT: no such file or directory, open 'package.json'`.
-* **Fix:** Created a root `package.json` with workspace delegation scripts that pass `npm --prefix Recruvate-App run ...`. Running `npm run dev` from the workspace root now starts the dev server immediately.
-
-### 8.2 Base44 Backend & Offline Fallback (`base44Client.js`)
-* **Issue:** When running without a live Base44 cloud account or `base44 link`, API calls to `/api/apps/undefined/...` failed with `TypeError: Failed to fetch`. This caused the app to freeze on an infinite loading spinner and prevented login, registration, and onboarding.
-* **Fix:** Added a comprehensive mock fallback inside `src/api/base44Client.js`. If no remote Base44 backend is configured:
-  - Auth runs locally via in-memory/localStorage (supports signup, login, OTP verification, and Google sign-in).
-  - Seeded 5 realistic job postings based on the PRD (HR Recruiter, Frontend Lead, People Partner, Full Stack Engineer, Product Designer).
-  - Enables full interactive onboarding (Details, Socials, Video pitch), application submission with the 48-hour countdown timer, and profile management.
-  - Added a "Fill Demo Credentials" button on the login screen for 1-click test access.
-
-### 8.3 Infinite Spinner & Lifecycle Safeguards
-* **Issue:** `AuthContext.jsx`, `AppShell.jsx`, `Onboarding.jsx`, and `OpenJobs.jsx` did not handle rejected network promises in `finally` blocks, leaving loading states permanently set to `true`.
-* **Fix:** Added `finally { setLoading(false) }`, set `authChecked(true)` on initialization failure, and added optional chaining guards so the UI renders gracefully even if the network is disconnected.
-
-### 8.4 PWA Manifest Fix
-* **Issue:** `entities/Job.jsonc` accidentally contained the contents of a PWA `manifest.json`, while `Job` had no valid schema and `index.html`'s `<link rel="manifest" href="/manifest.json" />` returned a 404.
-* **Fix:** Created `public/manifest.json` with the PWA metadata and restored `entities/Job.jsonc` to the proper schema.
-
-
+### Next Steps & Recommendations:
+1. **Demo & Testing:** Open the app at `http://127.0.0.1:5173/`, click "Fill Demo Credentials", log in, explore the open jobs feed, apply to roles, and check the Process Bar timer.
+2. **Onboarding Test:** Click "Sign Out" from Profile, switch to "Sign Up", fill credentials, and test the 3-step onboarding flow.
+3. **Publishing to Base44 Cloud:** When you are ready to connect a live Base44 cloud backend:
+   ```bash
+   base44 login
+   base44 link
+   base44 dev
+   ```
+   The app will automatically switch from local mock mode to your live Base44 cloud backend.
