@@ -17,3 +17,4 @@ export default function Video() {
 
   return <VideoStep profile={profile} onNext={handleNext} onBack={handleBack} />;
 }
+

@@ -17,3 +17,4 @@ export default function Socials() {
 
   return <SocialsStep profile={profile} onNext={handleNext} onSkip={handleSkip} />;
 }
+

@@ -13,3 +13,4 @@ export default function Details() {
 
   return <DetailsStep profile={profile} onNext={handleNext} />;
 }
+
