@@ -246,6 +246,19 @@ This file explains in **simple words**:
 
 ---
 
+## 21. Mobile-Only App View (No Desktop View Anywhere)
+* **What was the problem?**
+  The landing page and HR dashboard were stretched out across wide desktop monitors with multi-column tables, grids, and desktop navbars. The user requested that there should not be any desktop view, and that the entire platform should look and feel strictly like a mobile phone app.
+* **How it was fixed:**
+  - **Global Mobile Container (`src/App.jsx`):** Wrapped the entire application in a centered mobile app frame (`max-w-md min-h-screen bg-background shadow-2xl`). On desktop monitors, it displays cleanly centered like a mobile phone app in an emulator; on mobile phones, it fills 100% of the screen.
+  - **Mobile Landing Page (`src/pages/Landing.jsx`):** Rebuilt as a native mobile welcome screen with mobile cards, 1-click Demo buttons, and touch-friendly actions.
+  - **Mobile HR Dashboard (`src/pages/EmployerDashboard.jsx`):** Rebuilt into a mobile HR app with a mobile header, 2x2 metric cards, segment control tabs (`Applicants` | `Vacancies`), single-column applicant cards with 48h clock pills, mobile video pitch modal, mobile resume sheet, and a fixed mobile bottom navigation bar (`Applicants`, `Vacancies`, `Post Job`, `Candidate Mode`).
+  - **Mobile Onboarding & Login:** Converted `EmployerOnboarding.jsx` and `EmployerLogin.jsx` into clean, single-column mobile forms.
+* **What it does now:**
+  There is zero desktop layout anywhere. No matter what device or screen size is used, the app always renders as a pure mobile phone application.
+
+---
+
 ## Summary of Commands to Run
 
 To run the app right now:
