@@ -2,19 +2,13 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { 
   Building2, 
-  User, 
-  MapPin, 
-  Globe, 
-  Mail, 
   Video, 
   ArrowRight, 
   ArrowLeft, 
   CheckCircle2, 
   Loader2, 
   Upload, 
-  Play, 
-  RotateCcw,
-  Sparkles
+  RotateCcw
 } from "lucide-react";
 import BrandMark from "@/components/brand/BrandMark";
 import { base44 } from "@/api/base44Client";
@@ -102,9 +96,9 @@ export default function EmployerOnboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col justify-between p-5 sm:p-8">
+    <div className="min-h-screen bg-background flex flex-col justify-between p-4">
       {/* Top Header */}
-      <div className="mx-auto flex w-full max-w-xl items-center justify-between">
+      <div className="mx-auto flex w-full max-w-md items-center justify-between">
         <Link to="/landing">
           <BrandMark size="sm" />
         </Link>
@@ -114,16 +108,16 @@ export default function EmployerOnboarding() {
       </div>
 
       {/* Main Container */}
-      <div className="mx-auto w-full max-w-xl my-6">
+      <div className="mx-auto w-full max-w-md my-4">
         {step === 1 && (
-          <div className="rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-sm">
+          <div className="rounded-3xl border border-border bg-card p-5 shadow-sm">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary mb-2">
               <Building2 className="h-4 w-4" />
               <span>Step 1 · Organisation Onboarding</span>
             </div>
 
-            <h2 className="font-heading text-2xl font-black text-foreground">Tell us about your company</h2>
-            <p className="mt-1 text-xs sm:text-sm text-foreground/60">
+            <h2 className="font-heading text-xl font-black text-foreground">Tell us about your company</h2>
+            <p className="mt-1 text-xs text-foreground/60">
               This information will be presented to candidates on your job postings and company profile.
             </p>
 
@@ -133,8 +127,8 @@ export default function EmployerOnboarding() {
               </div>
             )}
 
-            <form onSubmit={handleDetailsSubmit} className="mt-6 space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
+            <form onSubmit={handleDetailsSubmit} className="mt-5 space-y-3.5">
+              <div className="space-y-3">
                 <div>
                   <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-foreground/60">
                     Company Name *
@@ -227,7 +221,7 @@ export default function EmployerOnboarding() {
                 </div>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-3">
                 <div>
                   <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-foreground/60">
                     Official Work Email *
@@ -258,9 +252,9 @@ export default function EmployerOnboarding() {
 
               <button
                 type="submit"
-                className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl brand-gradient text-sm font-bold text-white shadow-sm hover:opacity-95 transition press"
+                className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-xl brand-gradient text-xs font-bold text-white shadow-sm hover:opacity-95 transition press"
               >
-                <span>Continue to Company Video Intro</span>
+                <span>Continue to Video Intro</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </form>
@@ -268,7 +262,7 @@ export default function EmployerOnboarding() {
         )}
 
         {step === 2 && (
-          <div className="rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-sm">
+          <div className="rounded-3xl border border-border bg-card p-5 shadow-sm">
             <button
               onClick={() => setStep(1)}
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground/60 hover:text-foreground mb-4"

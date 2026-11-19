@@ -89,8 +89,12 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
-          <ScrollToTop />
-          <AuthenticatedApp />
+          <div className="min-h-screen w-full bg-[#0d0c14] flex justify-center">
+            <div className="w-full max-w-md min-h-screen bg-background relative flex flex-col shadow-[0_0_60px_rgba(0,0,0,0.5)] border-x border-border/30 overflow-x-hidden">
+              <ScrollToTop />
+              <AuthenticatedApp />
+            </div>
+          </div>
         </Router>
         <Toaster />
       </QueryClientProvider>

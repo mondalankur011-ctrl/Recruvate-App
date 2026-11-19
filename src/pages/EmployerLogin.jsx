@@ -6,13 +6,9 @@ import {
   Lock, 
   ArrowRight, 
   Loader2, 
-  Sparkles, 
-  ShieldCheck, 
-  Video, 
-  Briefcase 
+  Sparkles 
 } from "lucide-react";
 import BrandMark from "@/components/brand/BrandMark";
-import TextField from "@/components/auth/TextField";
 import { base44 } from "@/api/base44Client";
 
 export default function EmployerLogin() {
