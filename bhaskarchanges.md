@@ -233,6 +233,19 @@ This file explains in **simple words**:
 
 ---
 
+## 20. Blank Screen Fix (`src/components/app/AppShell.jsx` & `vite.config.js`)
+* **What was the problem?**
+  1. In `src/components/app/AppShell.jsx`, the new buttons `<Link to="/landing">` and `<Link to="/employer/dashboard">` were added, but `Link` was not imported from `react-router-dom`. When a logged-in user opened the app, it threw `ReferenceError: Link is not defined` and caused a completely blank screen.
+  2. `vite.config.js` was bound only to `127.0.0.1`. When users typed `http://localhost:5173`, some browsers that prefer IPv6 failed to reach the server.
+* **How it was fixed:**
+  - Added `Link` to the import list in `AppShell.jsx`: `import { Link, Navigate, useLocation } from "react-router-dom";`.
+  - Set `server: { host: true }` in `vite.config.js` so it binds to all local addresses (`localhost`, `127.0.0.1`, and network IP).
+  - Restarted the dev server cleanly.
+* **What it does now:**
+  The app renders immediately on both `http://localhost:5173` and `http://127.0.0.1:5173` without any blank screen or crashes.
+
+---
+
 ## Summary of Commands to Run
 
 To run the app right now:
