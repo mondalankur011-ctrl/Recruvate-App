@@ -106,6 +106,14 @@ export default function AuthScreen({ initialMode = "signup" }) {
 
   return (
     <AuthFrame>
+      <div className="mb-4 flex items-center justify-between rounded-xl bg-primary/5 border border-primary/20 px-3 py-2 text-xs">
+        <span className="font-semibold text-foreground/70">Are you hiring?</span>
+        <Link to="/employer/login" className="font-bold text-primary hover:underline flex items-center gap-1">
+          <span>HR Portal</span>
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
+
       <div className="flex rounded-2xl bg-muted p-1">
         {[
           { key: "signup", label: "Sign Up" },

@@ -17,9 +17,13 @@ import Onboarding from '@/pages/Onboarding';
 import OnboardingDetails from '@/pages/onboarding/Details';
 import OnboardingSocials from '@/pages/onboarding/Socials';
 import OnboardingVideo from '@/pages/onboarding/Video';
+import Landing from '@/pages/Landing';
+import EmployerLogin from '@/pages/EmployerLogin';
+import EmployerOnboarding from '@/pages/EmployerOnboarding';
+import EmployerDashboard from '@/pages/EmployerDashboard';
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
+  const { user, isAuthenticated, isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -38,12 +42,21 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
+      {/* Public Pages */}
+      <Route path="/landing" element={<Landing />} />
+      <Route path="/employer/login" element={<EmployerLogin />} />
+      <Route path="/employer/onboarding" element={<EmployerOnboarding />} />
+      <Route path="/employer/dashboard" element={<EmployerDashboard />} />
+      <Route path="/employer" element={<Navigate to="/employer/dashboard" replace />} />
+
+      {/* Candidate Auth */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
 
-      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+      {/* When not authenticated, visiting root shows Landing Page */}
+      <Route element={<ProtectedRoute unauthenticatedElement={<Landing />} />}>
         <Route path="/onboarding" element={<Onboarding />}>
           <Route index element={<Navigate to="details" replace />} />
           <Route path="details" element={<OnboardingDetails />} />

@@ -160,6 +160,79 @@ This file explains in **simple words**:
 
 ---
 
+## 15. Public Landing Page (`src/pages/Landing.jsx`)
+* **What was the problem?**
+  The app had no welcoming homepage for first-time visitors. If an unauthenticated user visited `http://127.0.0.1:5173/`, they were immediately bounced to the job seeker sign-in screen, with no way to learn what Recruvate does or explore the employer side.
+* **How it was fixed:**
+  Created a modern, responsive public landing page matching the Recruvate brand:
+  - Hero section explaining what Recruvate is ("The Modern Hiring Platform with 48h Response Clock").
+  - Clear 3-step timeline ("How It Works" for candidates and employers).
+  - Platform statistics (15K+ Placed, 500+ Partner Companies, 48h Clock, 95% Matching Accuracy).
+  - Dual action cards ("I'm Looking for a Job" & "I'm Hiring Talent").
+  - Instant 1-click demo login buttons for both Candidate and HR personas.
+* **What it does now:**
+  Anyone can visit `http://127.0.0.1:5173/` or `/landing` without logging in, see the product features, and jump straight into testing as either a candidate or an HR recruiter.
+
+---
+
+## 16. HR & Employer Login Page (`src/pages/EmployerLogin.jsx`)
+* **What was the problem?**
+  There was no dedicated login portal for company HRs, recruiters, or hiring managers. They had to use the candidate login form which had the wrong fields and role settings.
+* **How it was fixed:**
+  Created `src/pages/EmployerLogin.jsx` specifically for recruiters and employers:
+  - Work email and company password fields.
+  - One-click **"HR Demo Login (Priya Sharma · Recruvate)"** button to bypass typing during testing and demonstrations.
+  - Direct switch link to Candidate Login if someone clicks the wrong portal.
+* **What it does now:**
+  Recruiters have a clean, branded portal at `/employer/login` to sign in to their hiring dashboard.
+
+---
+
+## 17. Employer Onboarding & Video Pitch (`src/pages/EmployerOnboarding.jsx`)
+* **What was the problem?**
+  As proposed in the feature proposal PDF, when companies first sign up, they need to set up their organisation profile and optionally record a company culture video pitch (60–90 seconds) to attract top candidates.
+* **How it was fixed:**
+  Created `src/pages/EmployerOnboarding.jsx`:
+  - Step 1: Organisation Details (Company Name, HR Role, Industry, Team Size, Location, Website, Work Email).
+  - Step 2: Company Culture Video Pitch recorder & uploader with guided prompts ("Tell candidates about your team culture, mission, and why they should join").
+* **What it does now:**
+  New employers can quickly complete their company profile and culture pitch before reaching their hiring dashboard.
+
+---
+
+## 18. HR / Employer Dashboard (`src/pages/EmployerDashboard.jsx`)
+* **What was the problem?**
+  Recruvate had no recruiter dashboard to manage open job vacancies, review applicant submissions, inspect candidate video pitches, view resumes, or respond within the 48-hour response clock.
+* **How it was fixed:**
+  Created a complete, rich HR Dashboard at `/employer/dashboard`:
+  - **Live Metrics Bar:** Active Vacancies, Total Applicants, Video Pitches, and 48h Clock Pending countdown counters.
+  - **Applicant Pipeline Tab:**
+    - Filter candidates by status (All, Pending, Shortlisted, Interview, Offered, Rejected).
+    - Candidate summary cards showing name, role applied for, match percentage, experience, skills, and the active 48-hour response clock.
+    - **Watch Video Pitch Modal:** Plays the candidate's 60-second video pitch directly in an HTML5 video player.
+    - **View Resume Modal:** Opens candidate's resume/CV with education, work history, and contact details.
+    - **Pipeline Action Buttons:** Change candidate status to Shortlist, Schedule Interview, Send Offer, or Reject with 1 click.
+    - **Send Message Modal:** Direct in-app communication with candidates.
+  - **Manage Vacancies Tab:** View all posted jobs, toggle status (Active / Paused), inspect applicant counts, and close roles.
+  - **Post a New Vacancy Modal:** Complete job creation form with live preview (Title, Department, Job Type, Work Mode, Salary Range, Experience, Required Skills, Description).
+* **What it does now:**
+  HRs and hiring managers have a complete recruitment management command center right in their browser.
+
+---
+
+## 19. Demo Flow & Instant Role Switching
+* **What was the problem?**
+  Testers and stakeholders needed an easy way to demo both the candidate experience and the HR experience side-by-side without creating separate accounts or logging out manually.
+* **How it was fixed:**
+  - Added sample demo applicants (Pooja Varma, Arjun Mehta, Sneha Kapoor, Vikram Malhotra) with realistic video pitches, resumes, and active 48-hour timers in `base44Client.js`.
+  - Added a top-bar **"Hiring Mode →"** button in the candidate app shell so you can switch into HR mode anytime.
+  - Added a **"Switch to Candidate App"** link in the HR dashboard navigation.
+  - Added 1-click Demo buttons on both the landing page and employer login page.
+* **What it does now:**
+  You can effortlessly switch between the Candidate App and the HR Dashboard with zero friction.
+
+---
+
 ## Summary of Commands to Run
 
 To run the app right now:
@@ -167,3 +240,7 @@ To run the app right now:
 npm run dev
 ```
 Then open your browser to: **http://127.0.0.1:5173/**
+- Landing Page: **http://127.0.0.1:5173/** or **http://127.0.0.1:5173/landing**
+- HR / Employer Login: **http://127.0.0.1:5173/employer/login**
+- HR / Employer Dashboard: **http://127.0.0.1:5173/employer/dashboard**
+- Candidate Portal: **http://127.0.0.1:5173/login**

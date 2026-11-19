@@ -63,8 +63,18 @@ export default function AppShell() {
           style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
         >
           <div className="mx-auto flex w-full max-w-md items-center justify-between px-5 py-3">
-            <BrandMark size="sm" />
-            <NotificationBell user={user} />
+            <Link to="/landing">
+              <BrandMark size="sm" />
+            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                to="/employer/dashboard"
+                className="rounded-full border border-primary/25 bg-primary/10 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-primary hover:bg-primary hover:text-white transition press"
+              >
+                Hiring Mode →
+              </Link>
+              <NotificationBell user={user} />
+            </div>
           </div>
         </header>
 
